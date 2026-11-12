@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AUTTEC 2.0 — Engenharia de Processos & Fluxo Visual</title>
+    <title>AUTTEC 2.0 — Engenharia Industrial</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -16,11 +16,16 @@
                         mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
-                        brand: {
-                            400: '#818cf8',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
+                        carbon: {
+                            950: '#09090b',
+                            900: '#111114',
+                            850: '#18181c',
+                            800: '#222227',
+                        },
+                        crimson: {
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
                         }
                     }
                 }
@@ -28,37 +33,6 @@
         }
     </script>
     <style>
-        /* Animação do fluxo nas conexões SVG */
-        @keyframes dashFlow {
-            to {
-                stroke-dashoffset: -24;
-            }
-        }
-        .flow-line-animated {
-            stroke-dasharray: 8 4;
-            animation: dashFlow 0.8s linear infinite;
-        }
-        .node-card {
-            transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
-            user-select: none;
-        }
-        .node-card:hover {
-            box-shadow: 0 20px 35px -10px rgba(99, 102, 241, 0.25);
-        }
-        .node-card.dragging {
-            cursor: grabbing !important;
-            z-index: 50 !important;
-            transform: scale(1.02);
-            box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.45);
-        }
-        /* Grid de engenharia no fundo */
-        .engineering-grid {
-            background-size: 32px 32px;
-            background-image: 
-                linear-gradient(to right, rgba(51, 65, 85, 0.25) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(51, 65, 85, 0.25) 1px, transparent 1px);
-        }
-        /* Estilos de Impressão PDF A4 */
         @media print {
             body * { visibility: hidden; }
             #print-section, #print-section * { visibility: visible; }
@@ -68,337 +42,233 @@
                 top: 0;
                 width: 100%;
                 background: white !important;
-                color: #0f172a !important;
+                color: #09090b !important;
                 padding: 1.5rem;
             }
             .no-print { display: none !important; }
         }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #09090b; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #dc2626; }
     </style>
 </head>
-<body class="h-full bg-slate-950 text-slate-100 flex flex-col overflow-hidden">
+<body class="h-full bg-carbon-950 text-zinc-100 flex overflow-hidden font-sans">
 
-    <!-- HEADER SUPERIOR -->
-    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-5 py-3 flex items-center justify-between z-30 no-print">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-brand-600 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                <i class="fa-solid fa-microchip text-white text-lg"></i>
-            </div>
-            <div>
-                <div class="flex items-center gap-2">
-                    <span class="font-extrabold text-lg tracking-tight text-white">auttec <span class="text-indigo-400">2.0</span></span>
-                    <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Lean 4.0</span>
+    <!-- SIDEBAR: PÁGINAS DE PROCESSOS -->
+    <aside class="w-64 bg-carbon-900 border-r border-zinc-800 flex flex-col justify-between no-print shrink-0">
+        <div class="flex flex-col flex-1 overflow-hidden">
+            <!-- Logo Industrial -->
+            <div class="p-4 border-b border-zinc-800 flex items-center gap-3">
+                <div class="w-9 h-9 bg-crimson-600 rounded-lg flex items-center justify-center font-black text-white text-base tracking-tighter shadow-lg shadow-crimson-600/20">
+                    A2
                 </div>
-                <p class="text-[11px] text-slate-400">Engenharia de Processos, Cronoanálise & Fluxo Interativo</p>
-            </div>
-        </div>
-
-        <!-- Nome do Produto -->
-        <div class="hidden md:flex items-center gap-2 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-xl">
-            <i class="fa-solid fa-cube text-indigo-400 text-xs"></i>
-            <input type="text" id="product-name" value="Conjunto Atuador Eletromecânico v2" class="bg-transparent text-xs font-medium text-slate-200 focus:outline-none w-64" placeholder="Nome do Produto...">
-        </div>
-
-        <!-- Ações Principais -->
-        <div class="flex items-center gap-2.5">
-            <button onclick="app.autoAlign()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1.5 border border-slate-700" title="Organizar fluxo automaticamente">
-                <i class="fa-solid fa-wand-magic-sparkles text-indigo-400"></i> Alinhar Fluxo
-            </button>
-            <button onclick="app.generateITModal()" class="bg-gradient-to-r from-indigo-600 to-brand-600 hover:from-indigo-500 hover:to-brand-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2 shadow-lg shadow-indigo-600/25">
-                <i class="fa-solid fa-file-pdf"></i> Gerar IT Geral & BOM (PDF)
-            </button>
-        </div>
-    </header>
-
-    <!-- ÁREA PRINCIPAL -->
-    <div class="flex-1 flex overflow-hidden relative">
-
-        <!-- PALETA LATERAL DE BLOCOS PADRÕES -->
-        <aside class="w-60 bg-slate-900/95 border-r border-slate-800 p-4 flex flex-col justify-between z-20 no-print">
-            <div class="space-y-4">
                 <div>
-                    <h2 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-shapes text-indigo-400"></i> Blocos Padrões
-                    </h2>
-                    <div class="space-y-2">
-                        <button onclick="app.addBlock('montagem')" class="w-full text-left p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 hover:border-indigo-500/50 transition flex items-center gap-3 group">
-                            <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center group-hover:scale-110 transition">
-                                <i class="fa-solid fa-gears"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs font-semibold text-slate-200">Montagem</div>
-                                <div class="text-[10px] text-slate-500">Operação principal</div>
-                            </div>
-                        </button>
-
-                        <button onclick="app.addBlock('subconjunto')" class="w-full text-left p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 hover:border-cyan-500/50 transition flex items-center gap-3 group">
-                            <div class="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition">
-                                <i class="fa-solid fa-puzzle-piece"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs font-semibold text-slate-200">Subconjunto</div>
-                                <div class="text-[10px] text-slate-500">Pré-montagem</div>
-                            </div>
-                        </button>
-
-                        <button onclick="app.addBlock('usinagem')" class="w-full text-left p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 hover:border-amber-500/50 transition flex items-center gap-3 group">
-                            <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center group-hover:scale-110 transition">
-                                <i class="fa-solid fa-hammer"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs font-semibold text-slate-200">Usinagem / Fab.</div>
-                                <div class="text-[10px] text-slate-500">Transformação</div>
-                            </div>
-                        </button>
-
-                        <button onclick="app.addBlock('inspecao')" class="w-full text-left p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 hover:border-emerald-500/50 transition flex items-center gap-3 group">
-                            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition">
-                                <i class="fa-solid fa-shield-halved"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs font-semibold text-slate-200">Inspeção & Teste</div>
-                                <div class="text-[10px] text-slate-500">Qualidade / RQ</div>
-                            </div>
-                        </button>
-
-                        <button onclick="app.addBlock('embalagem')" class="w-full text-left p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 hover:border-purple-500/50 transition flex items-center gap-3 group">
-                            <div class="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center group-hover:scale-110 transition">
-                                <i class="fa-solid fa-box-archive"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs font-semibold text-slate-200">Embalagem</div>
-                                <div class="text-[10px] text-slate-500">Expedição final</div>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Dica de uso -->
-                <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3 text-[11px] text-slate-400 space-y-1.5">
-                    <div class="font-semibold text-slate-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-circle-info text-indigo-400"></i> Como usar:
-                    </div>
-                    <p>• <strong>Arraste</strong> os blocos livremente no canvas.</p>
-                    <p>• Clique no ícone <i class="fa-solid fa-link text-indigo-400"></i> para <strong>conectar</strong> células.</p>
-                    <p>• Clique em <strong>Editar Célula</strong> para cronoanálise e BOM.</p>
+                    <div class="font-extrabold text-sm tracking-wide uppercase text-white">AUTTEC <span class="text-crimson-500">2.0</span></div>
+                    <div class="text-[10px] font-mono text-zinc-500 uppercase">Processos & Produção</div>
                 </div>
             </div>
 
-            <!-- KPIs Resumidos -->
-            <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-2.5">
-                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Métricas da Linha</div>
-                <div class="flex justify-between items-center text-xs">
-                    <span class="text-slate-400">Células Ativas:</span>
-                    <span id="kpi-cells" class="font-mono font-bold text-white">0</span>
-                </div>
-                <div class="flex justify-between items-center text-xs">
-                    <span class="text-slate-400">Lead Time Total:</span>
-                    <span id="kpi-time" class="font-mono font-bold text-emerald-400">0.0 s</span>
-                </div>
-                <div class="flex justify-between items-center text-xs">
-                    <span class="text-slate-400">Peças na BOM:</span>
-                    <span id="kpi-bom" class="font-mono font-bold text-amber-400">0</span>
-                </div>
-            </div>
-        </aside>
-
-        <!-- CANVAS INTERATIVO INFINITO -->
-        <main id="canvas-viewport" class="flex-1 relative overflow-hidden engineering-grid bg-slate-950 cursor-grab active:cursor-grabbing">
-            
-            <!-- Banner de modo de conexão -->
-            <div id="connect-banner" class="hidden absolute top-4 left-1/2 -translate-x-1/2 z-30 bg-indigo-600 text-white px-4 py-2 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2 animate-bounce">
-                <i class="fa-solid fa-link"></i> Selecione a célula de destino para conectar...
-                <button onclick="app.cancelConnect()" class="ml-2 bg-indigo-800 hover:bg-indigo-900 px-2 py-0.5 rounded-full text-[10px]">Cancelar</button>
-            </div>
-
-            <!-- Controles de Zoom -->
-            <div class="absolute bottom-5 left-5 z-20 flex items-center gap-1.5 bg-slate-900/90 backdrop-blur border border-slate-800 p-1.5 rounded-xl shadow-xl no-print">
-                <button onclick="app.zoom(-0.1)" class="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-300 flex items-center justify-center transition"><i class="fa-solid fa-minus text-xs"></i></button>
-                <span id="zoom-level" class="text-xs font-mono text-slate-300 px-2">100%</span>
-                <button onclick="app.zoom(0.1)" class="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-300 flex items-center justify-center transition"><i class="fa-solid fa-plus text-xs"></i></button>
-                <button onclick="app.resetView()" class="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 flex items-center justify-center transition" title="Centralizar"><i class="fa-solid fa-compress text-xs"></i></button>
-            </div>
-
-            <!-- Palco Transformável (Pan + Zoom) -->
-            <div id="canvas-stage" class="absolute inset-0 origin-top-left" style="transform: translate(0px, 0px) scale(1);">
-                <!-- Camada SVG para conexões animadas -->
-                <svg id="connections-svg" class="absolute top-0 left-0 w-[4000px] h-[4000px] pointer-events-none z-0">
-                    <defs>
-                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                            <polygon points="0 0, 10 3.5, 0 7" fill="#6366f1" />
-                        </marker>
-                    </defs>
-                </svg>
-
-                <!-- Camada de Nós (Células) -->
-                <div id="nodes-layer" class="relative z-10"></div>
-            </div>
-        </main>
-
-        <!-- PAINEL LATERAL DE ENGENHARIA (DRAWER) -->
-        <aside id="editor-drawer" class="w-[480px] bg-slate-900 border-l border-slate-800 flex flex-col z-30 shadow-2xl transition-transform duration-300 translate-x-full absolute right-0 top-0 bottom-0 no-print">
-            <!-- Header do Drawer -->
-            <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900">
-                <div class="flex items-center gap-3">
-                    <div id="drawer-icon" class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center"></div>
-                    <div>
-                        <h3 id="drawer-title" class="font-bold text-sm text-white">Configuração da Célula</h3>
-                        <p id="drawer-subtitle" class="text-[11px] text-slate-400">Parâmetros técnicos e cronoanálise</p>
-                    </div>
-                </div>
-                <button onclick="app.closeDrawer()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition">
-                    <i class="fa-solid fa-xmark"></i>
+            <!-- Botão Nova Página -->
+            <div class="p-3 border-b border-zinc-800/80">
+                <button onclick="app.createPage()" class="w-full bg-crimson-600 hover:bg-crimson-700 text-white py-2 px-3 rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Nova Página
                 </button>
             </div>
 
-            <!-- Navegação em Abas -->
-            <div class="flex border-b border-slate-800 bg-slate-950/50 text-xs font-medium">
-                <button onclick="app.setTab('geral')" id="tab-geral" class="flex-1 py-2.5 border-b-2 border-indigo-500 text-indigo-400">Geral & Crono</button>
-                <button onclick="app.setTab('etapas')" id="tab-etapas" class="flex-1 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200">Etapas</button>
-                <button onclick="app.setTab('bom')" id="tab-bom" class="flex-1 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200">Peças (BOM)</button>
-                <button onclick="app.setTab('docs')" id="tab-docs" class="flex-1 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200">Ferram. & RQs</button>
+            <!-- Lista de Páginas -->
+            <div class="p-2 flex-1 overflow-y-auto custom-scrollbar space-y-1" id="pages-list">
+                <!-- Preenchido via JS -->
             </div>
+        </div>
 
-            <!-- Conteúdo da Aba -->
-            <div id="drawer-body" class="flex-1 overflow-y-auto p-5 custom-scrollbar space-y-5"></div>
+        <!-- Rodapé Sidebar -->
+        <div class="p-3 border-t border-zinc-800 text-[11px] text-zinc-500 flex justify-between items-center">
+            <span>Salvo localmente</span>
+            <button onclick="app.resetAll()" class="text-zinc-500 hover:text-crimson-500 transition" title="Resetar tudo">
+                <i class="fa-solid fa-rotate-left"></i>
+            </button>
+        </div>
+    </aside>
 
-            <!-- Rodapé do Drawer -->
-            <div class="p-4 border-t border-slate-800 bg-slate-900 flex justify-between items-center">
-                <button onclick="app.deleteActiveCell()" class="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-rose-500/10 transition">
-                    <i class="fa-solid fa-trash-can"></i> Excluir Célula
+    <!-- ÁREA PRINCIPAL DA PÁGINA ATIVA -->
+    <main class="flex-1 flex flex-col overflow-hidden bg-carbon-950">
+
+        <!-- BARRA SUPERIOR DE AÇÕES -->
+        <header class="h-14 bg-carbon-900 border-b border-zinc-800 px-6 flex items-center justify-between no-print shrink-0">
+            <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-crimson-500"></span>
+                <span class="text-xs font-mono uppercase text-zinc-400">Página Ativa:</span>
+                <span id="header-page-title" class="text-sm font-bold text-white truncate max-w-md">—</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="app.openITModal()" class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf text-crimson-500"></i> Gerar PDF (IT & BOM)
                 </button>
-                <div class="flex gap-2">
-                    <button onclick="app.closeDrawer()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition">Fechar</button>
-                    <button onclick="app.saveDrawer()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-lg shadow-indigo-600/20 transition">Salvar Célula</button>
-                </div>
+                <button onclick="app.deleteCurrentPage()" class="bg-zinc-900 hover:bg-crimson-950 border border-zinc-800 hover:border-crimson-800 text-zinc-400 hover:text-crimson-400 p-2 rounded-lg text-xs transition" title="Excluir esta página">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
             </div>
-        </aside>
-    </div>
+        </header>
 
-    <!-- MODAL DE VISUALIZAÇÃO E EXPORTAÇÃO PDF (IT GERAL & BOM) -->
-    <div id="it-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-            <div class="p-4 border-b border-slate-800 flex justify-between items-center no-print">
-                <div class="flex items-center gap-2.5">
-                    <i class="fa-solid fa-file-contract text-indigo-400 text-lg"></i>
-                    <span class="font-bold text-sm text-white">Instrução de Trabalho (IT) Geral & BOM Consolidada</span>
-                </div>
+        <!-- CONTEÚDO ROLÁVEL DA PÁGINA -->
+        <div class="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-6" id="page-workspace">
+            <!-- Gerado via JS -->
+        </div>
+    </main>
+
+    <!-- DRAWER LATERAL: EDIÇÃO TÉCNICA DA CÉLULA -->
+    <aside id="cell-drawer" class="w-[460px] bg-carbon-900 border-l border-zinc-800 flex flex-col z-30 shadow-2xl transition-transform duration-200 translate-x-full fixed right-0 top-0 bottom-0 no-print">
+        <div class="p-4 border-b border-zinc-800 flex items-center justify-between">
+            <div>
+                <span class="text-[10px] font-mono uppercase text-crimson-500 font-bold">Configuração da Célula</span>
+                <h3 id="drawer-cell-name" class="text-sm font-bold text-white">Célula</h3>
+            </div>
+            <button onclick="app.closeDrawer()" class="text-zinc-400 hover:text-white p-2 rounded-lg hover:bg-zinc-800">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Abas -->
+        <div class="flex border-b border-zinc-800 bg-carbon-950 text-xs font-semibold">
+            <button onclick="app.setTab('geral')" id="tab-geral" class="flex-1 py-2.5 border-b-2 border-crimson-600 text-white">Geral & Crono</button>
+            <button onclick="app.setTab('etapas')" id="tab-etapas" class="flex-1 py-2.5 border-b-2 border-transparent text-zinc-500 hover:text-zinc-300">Etapas</button>
+            <button onclick="app.setTab('bom')" id="tab-bom" class="flex-1 py-2.5 border-b-2 border-transparent text-zinc-500 hover:text-zinc-300">Peças (BOM)</button>
+            <button onclick="app.setTab('docs')" id="tab-docs" class="flex-1 py-2.5 border-b-2 border-transparent text-zinc-500 hover:text-zinc-300">Ferram. & RQs</button>
+        </div>
+
+        <div id="drawer-content" class="flex-1 overflow-y-auto p-5 custom-scrollbar space-y-4"></div>
+
+        <div class="p-4 border-t border-zinc-800 bg-carbon-900 flex justify-between items-center">
+            <button onclick="app.deleteActiveCell()" class="text-xs text-crimson-500 hover:underline flex items-center gap-1.5">
+                <i class="fa-solid fa-trash-can"></i> Remover Célula
+            </button>
+            <div class="flex gap-2">
+                <button onclick="app.closeDrawer()" class="px-4 py-2 rounded-lg bg-zinc-800 text-xs text-zinc-300">Cancelar</button>
+                <button onclick="app.saveDrawer()" class="px-5 py-2 rounded-lg bg-crimson-600 hover:bg-crimson-700 text-xs font-bold text-white">Salvar</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MODAL PDF (IT GERAL + BOM) -->
+    <div id="it-modal" class="fixed inset-0 bg-black/85 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-carbon-900 border border-zinc-800 rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-4 border-b border-zinc-800 flex justify-between items-center no-print">
+                <span class="font-bold text-sm text-white flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf text-crimson-500"></i> Documento Técnico — IT Geral & BOM Consolidada
+                </span>
                 <div class="flex items-center gap-2">
-                    <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2 shadow-lg shadow-emerald-600/20">
-                        <i class="fa-solid fa-print"></i> Imprimir / Salvar como PDF
+                    <button onclick="window.print()" class="bg-crimson-600 hover:bg-crimson-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-print"></i> Imprimir / Salvar PDF
                     </button>
-                    <button onclick="app.closeITModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800"><i class="fa-solid fa-xmark"></i></button>
+                    <button onclick="app.closeITModal()" class="text-zinc-400 hover:text-white p-2"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
-            <div id="print-section" class="flex-1 overflow-y-auto p-8 bg-white text-slate-900 custom-scrollbar"></div>
+            <div id="print-section" class="flex-1 overflow-y-auto p-8 bg-white text-zinc-950 custom-scrollbar"></div>
         </div>
     </div>
 
     <script>
-        const BLOCK_STYLES = {
-            montagem: { label: 'Montagem', icon: 'fa-gears', accent: '#6366f1', badgeBg: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30' },
-            subconjunto: { label: 'Subconjunto', icon: 'fa-puzzle-piece', accent: '#06b6d4', badgeBg: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30' },
-            usinagem: { label: 'Usinagem', icon: 'fa-hammer', accent: '#f59e0b', badgeBg: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
-            inspecao: { label: 'Inspeção / RQ', icon: 'fa-shield-halved', accent: '#10b981', badgeBg: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
-            embalagem: { label: 'Embalagem', icon: 'fa-box-archive', accent: '#a855f7', badgeBg: 'bg-purple-500/15 text-purple-400 border-purple-500/30' }
+        const DEFAULT_DATA = {
+            activePageId: 1,
+            pages: [
+                {
+                    id: 1,
+                    title: 'Linha 01 — Redutor Planetário',
+                    photo: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80',
+                    result: 'Conjunto redutor montado, lubrificado e testado com torque nominal de 45 Nm e zero vazamento.',
+                    cells: [
+                        {
+                            id: 11,
+                            type: 'Subconjunto',
+                            name: '01. Montagem das Engrenagens Satélites',
+                            operator: 'Operador Montagem I',
+                            input: 'Porta-satélites + 3 Engrenagens',
+                            kanban: 'Lote 15 un.',
+                            cycleObs: 38.0,
+                            rating: 100,
+                            allowance: 10,
+                            steps: [
+                                'Aplicar graxa sintética nos pinos dos satélites.',
+                                'Encaixar as 3 engrenagens planetárias e travar com anel elástico.'
+                            ],
+                            bom: [
+                                { code: 'ENG-304', desc: 'Engrenagem Satélite Aço Temperado', qty: 3, unit: 'un' },
+                                { code: 'PRT-101', desc: 'Suporte Porta-Satélites', qty: 1, unit: 'un' }
+                            ],
+                            tools: ['Alicate de Anéis Internos', 'Aplicador de Graxa Pneumático'],
+                            docs: ['IT-RED-01', 'RQ-04 (Folga Axial)']
+                        },
+                        {
+                            id: 12,
+                            type: 'Montagem',
+                            name: '02. Fechamento da Carcaça e Torque',
+                            operator: 'Operador Mecânico II',
+                            input: 'Subconjunto + Carcaça Frontal',
+                            kanban: 'Lote 15 un.',
+                            cycleObs: 52.0,
+                            rating: 105,
+                            allowance: 12,
+                            steps: [
+                                'Posicionar junta de vedação na flange.',
+                                'Fechar carcaça e apertar 6 parafusos M8 em cruz (25 Nm).'
+                            ],
+                            bom: [
+                                { code: 'CRC-900', desc: 'Carcaça Frontal Alumínio', qty: 1, unit: 'un' },
+                                { code: 'PRF-M8', desc: 'Parafuso Allen M8x30', qty: 6, unit: 'un' }
+                            ],
+                            tools: ['Torquímetro Digital 25 Nm'],
+                            docs: ['IT-RED-02', 'RQ-08 (Estanqueidade)']
+                        }
+                    ]
+                },
+                {
+                    id: 2,
+                    title: 'Linha 02 — Painel de Comando Elétrico',
+                    photo: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
+                    result: 'Quadro elétrico cablado, anilhado e aprovado no teste de continuidade e isolação.',
+                    cells: [
+                        {
+                            id: 21,
+                            type: 'Montagem',
+                            name: '01. Fixação de Trilhos DIN e Disjuntores',
+                            operator: 'Montador Eletricista I',
+                            input: 'Placa de Montagem + Componentes',
+                            kanban: 'Lote 5 un.',
+                            cycleObs: 65.0,
+                            rating: 100,
+                            allowance: 10,
+                            steps: [
+                                'Fixar trilhos DIN conforme gabarito.',
+                                'Encaixar disjuntores, contatores e bornes.'
+                            ],
+                            bom: [
+                                { code: 'DISJ-16A', desc: 'Disjuntor Bipolar 16A Curva C', qty: 2, unit: 'un' },
+                                { code: 'CONT-24V', desc: 'Contator Tripolar Bobina 24Vcc', qty: 3, unit: 'un' }
+                            ],
+                            tools: ['Parafusadeira Elétrica', 'Chave Fenda Isolada'],
+                            docs: ['ESQ-EL-20', 'RQ-EL-01']
+                        }
+                    ]
+                }
+            ]
         };
 
-        const state = {
-            cells: [
-                {
-                    id: 101,
-                    x: 80,
-                    y: 120,
-                    type: 'subconjunto',
-                    name: 'Célula 01 — Pré-Montagem Núcleo',
-                    operator: '1x Operador Montagem I',
-                    input: 'Carcaça Usinada + Rolamentos',
-                    kanban: 'Lote Padrão: 10 un.',
-                    cycleObs: 42.0,
-                    rating: 105,
-                    allowance: 12,
-                    setup: 10,
-                    steps: [
-                        'Limpar alojamento do rolamento com solvente dielétrico.',
-                        'Prensar rolamento 6204-2RS usando dispositivo PR-04.',
-                        'Inserir anel elástico de retenção e verificar folga axial.'
-                    ],
-                    bom: [
-                        { code: 'MAT-001', desc: 'Carcaça Alumínio Injetado', qty: 1, unit: 'un' },
-                        { code: 'ROL-6204', desc: 'Rolamento Rígido Esferas 6204', qty: 2, unit: 'un' },
-                        { code: 'ANL-020', desc: 'Anel Elástico Interno 47mm', qty: 1, unit: 'un' }
-                    ],
-                    tools: ['Prensa Hidráulica 5T', 'Dispositivo PR-04', 'Alicate Bico Reto'],
-                    docs: ['IT-MNT-001 Rev.03', 'RQ-DIM-01 (Controle Dimensional)']
-                },
-                {
-                    id: 102,
-                    x: 470,
-                    y: 220,
-                    type: 'montagem',
-                    name: 'Célula 02 — Acoplamento Motor',
-                    operator: '1x Operador Eletromecânico II',
-                    input: 'Subconjunto Núcleo + Motor BLDC',
-                    kanban: 'Lote Padrão: 10 un.',
-                    cycleObs: 58.5,
-                    rating: 100,
-                    allowance: 10,
-                    setup: 15,
-                    steps: [
-                        'Posicionar subconjunto no berço pneumático.',
-                        'Aplicar trava química Loctite 242 nos 4 parafusos M6.',
-                        'Acoplar motor BLDC e aplicar torque cruzado de 12 Nm.'
-                    ],
-                    bom: [
-                        { code: 'MTR-BLDC-24', desc: 'Motor Brushless 24V 250W', qty: 1, unit: 'un' },
-                        { code: 'PRF-M6X20', desc: 'Parafuso Allen M6x20 Inox', qty: 4, unit: 'un' }
-                    ],
-                    tools: ['Parafusadeira Eletrônica 12Nm', 'Berço Pneumático BP-02'],
-                    docs: ['IT-MNT-002 Rev.01', 'DT-EL-104 (Esquema Ligação)']
-                },
-                {
-                    id: 103,
-                    x: 860,
-                    y: 120,
-                    type: 'inspecao',
-                    name: 'Célula 03 — Teste Funcional & Hipot',
-                    operator: '1x Inspetor Qualidade',
-                    input: 'Conjunto Montado',
-                    kanban: 'Fluxo Unitário (One-Piece)',
-                    cycleObs: 35.0,
-                    rating: 100,
-                    allowance: 8,
-                    setup: 5,
-                    steps: [
-                        'Conectar chicote na bancada de testes automatizada.',
-                        'Executar ciclo de teste de corrente, rotação e isolação (Hipot).',
-                        'Imprimir etiqueta QR Code de rastreabilidade se APROVADO.'
-                    ],
-                    bom: [
-                        { code: 'ETQ-QR-01', desc: 'Etiqueta Poliéster Rastreabilidade', qty: 1, unit: 'un' }
-                    ],
-                    tools: ['Bancada de Teste BT-400', 'Leitor Código de Barras'],
-                    docs: ['RQ-TST-09 (Registro Teste Final)', 'PO-QLD-012']
-                }
-            ],
-            connections: [
-                { from: 101, to: 102 },
-                { from: 102, to: 103 }
-            ],
-            pan: { x: 0, y: 0 },
-            scale: 1,
-            activeCellId: null,
-            activeTab: 'geral',
-            connectingFrom: null
-        };
+        let state = JSON.parse(localStorage.getItem('auttec_v2_data')) || DEFAULT_DATA;
+        let activeCellId = null;
+        let activeTab = 'geral';
 
         const app = {
             init() {
-                this.setupCanvasPanZoom();
                 this.render();
+            },
+
+            saveStorage() {
+                localStorage.setItem('auttec_v2_data', JSON.stringify(state));
+            },
+
+            getCurrentPage() {
+                return state.pages.find(p => p.id === state.activePageId) || state.pages[0];
             },
 
             calcStandardTime(cell) {
@@ -406,429 +276,392 @@
             },
 
             render() {
-                this.renderNodes();
-                this.renderConnections();
-                this.updateKPIs();
+                this.renderSidebar();
+                this.renderWorkspace();
             },
 
-            renderNodes() {
-                const layer = document.getElementById('nodes-layer');
-                layer.innerHTML = '';
-
-                state.cells.forEach((cell, index) => {
-                    const style = BLOCK_STYLES[cell.type] || BLOCK_STYLES.montagem;
-                    const st = this.calcStandardTime(cell).toFixed(1);
-                    const isSelected = state.activeCellId === cell.id;
-
-                    const el = document.createElement('div');
-                    el.id = `node-${cell.id}`;
-                    el.style.left = `${cell.x}px`;
-                    el.style.top = `${cell.y}px`;
-                    el.style.width = '300px';
-                    el.className = `node-card absolute bg-slate-900/95 backdrop-blur-md border ${isSelected ? 'border-indigo-500 ring-2 ring-indigo-500/30' : 'border-slate-800'} rounded-2xl p-4 cursor-grab shadow-xl`;
-
-                    el.innerHTML = `
-                        <div class="flex items-start justify-between gap-2 mb-3">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style="background: ${style.accent}20; color: ${style.accent}">
-                                    <i class="fa-solid ${style.icon}"></i>
-                                </div>
-                                <div>
-                                    <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full border ${style.badgeBg}">${style.label}</span>
-                                    <h4 class="font-bold text-xs text-white mt-1 leading-snug">${cell.name}</h4>
-                                </div>
+            renderSidebar() {
+                const list = document.getElementById('pages-list');
+                list.innerHTML = state.pages.map(page => {
+                    const isActive = page.id === state.activePageId;
+                    return `
+                        <button onclick="app.selectPage(${page.id})" class="w-full text-left px-3 py-2.5 rounded-lg text-xs font-medium transition flex items-center justify-between group ${isActive ? 'bg-crimson-600/15 text-white border border-crimson-600/40' : 'text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200 border border-transparent'}">
+                            <div class="flex items-center gap-2.5 truncate">
+                                <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-crimson-500' : 'bg-zinc-600'}"></span>
+                                <span class="truncate">${page.title}</span>
                             </div>
-                            <button onclick="event.stopPropagation(); app.startConnect(${cell.id})" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white flex items-center justify-center transition" title="Conectar a outra célula">
-                                <i class="fa-solid fa-link text-[11px]"></i>
-                            </button>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2 bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80 text-[11px] mb-3">
-                            <div>
-                                <span class="text-slate-500 block text-[10px]">Operador</span>
-                                <span class="text-slate-200 font-medium truncate block">${cell.operator}</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-500 block text-[10px]">Tempo Padrão</span>
-                                <span class="text-emerald-400 font-mono font-bold">${st} s</span>
-                            </div>
-                            <div class="col-span-2 pt-1 border-t border-slate-800/60 flex justify-between text-[10px] text-slate-400">
-                                <span><i class="fa-solid fa-rotate text-indigo-400 mr-1"></i>${cell.kanban}</span>
-                                <span><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1"></i>${cell.bom.length} itens</span>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between pt-1">
-                            <div class="flex items-center gap-2 text-[10px] text-slate-400">
-                                <span><i class="fa-solid fa-list-ol text-indigo-400 mr-1"></i>${cell.steps.length} etapas</span>
-                                <span><i class="fa-solid fa-file-shield text-emerald-400 mr-1"></i>${cell.docs.length} RQs</span>
-                            </div>
-                            <button onclick="event.stopPropagation(); app.openDrawer(${cell.id})" class="bg-slate-800 hover:bg-indigo-600 text-slate-200 hover:text-white px-3 py-1.5 rounded-lg text-[11px] font-semibold transition">
-                                Editar Célula
-                            </button>
-                        </div>
+                            <span class="text-[10px] font-mono text-zinc-500">${page.cells.length}</span>
+                        </button>
                     `;
-
-                    // Lógica de arrastar o bloco (Drag & Drop)
-                    this.makeNodeDraggable(el, cell);
-
-                    // Clique para finalizar conexão se estiver no modo conectar
-                    el.addEventListener('click', (e) => {
-                        if (state.connectingFrom && state.connectingFrom !== cell.id) {
-                            e.stopPropagation();
-                            this.completeConnect(cell.id);
-                        }
-                    });
-
-                    layer.appendChild(el);
-                });
+                }).join('');
             },
 
-            makeNodeDraggable(el, cell) {
-                let isDragging = false;
-                let startX, startY, initialX, initialY;
+            renderWorkspace() {
+                const page = this.getCurrentPage();
+                if (!page) return;
 
-                el.addEventListener('mousedown', (e) => {
-                    if (e.target.closest('button')) return;
-                    e.stopPropagation();
-                    isDragging = true;
-                    el.classList.add('dragging');
-                    startX = e.clientX;
-                    startY = e.clientY;
-                    initialX = cell.x;
-                    initialY = cell.y;
-                });
+                document.getElementById('header-page-title').innerText = page.title;
+                const totalCycle = page.cells.reduce((sum, c) => sum + this.calcStandardTime(c), 0);
+                const totalItems = page.cells.reduce((sum, c) => sum + c.bom.length, 0);
 
-                window.addEventListener('mousemove', (e) => {
-                    if (!isDragging) return;
-                    const dx = (e.clientX - startX) / state.scale;
-                    const dy = (e.clientY - startY) / state.scale;
-                    cell.x = Math.max(0, Math.round(initialX + dx));
-                    cell.y = Math.max(0, Math.round(initialY + dy));
-                    el.style.left = `${cell.x}px`;
-                    el.style.top = `${cell.y}px`;
-                    this.renderConnections();
-                });
+                const workspace = document.getElementById('page-workspace');
+                workspace.innerHTML = `
+                    <!-- CARTÃO PRINCIPAL DA PÁGINA: NOME, FOTO E RESULTADO -->
+                    <section class="bg-carbon-900 border border-zinc-800 rounded-xl p-5 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                        <!-- Foto do Processo / Produto -->
+                        <div class="lg:col-span-4">
+                            <div class="relative group rounded-lg overflow-hidden border border-zinc-800 bg-carbon-950 aspect-video flex items-center justify-center">
+                                ${page.photo 
+                                    ? `<img src="${page.photo}" alt="Foto do processo" class="w-full h-full object-cover">`
+                                    : `<div class="text-center text-zinc-600 text-xs p-4"><i class="fa-solid fa-image text-2xl mb-1 block"></i>Sem foto definida</div>`
+                                }
+                                <label class="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center cursor-pointer text-xs font-semibold text-white gap-1">
+                                    <i class="fa-solid fa-camera text-crimson-500 text-base"></i>
+                                    <span>Alterar Foto</span>
+                                    <input type="file" accept="image/*" onchange="app.uploadPhoto(event)" class="hidden">
+                                </label>
+                            </div>
+                        </div>
 
-                window.addEventListener('mouseup', () => {
-                    if (isDragging) {
-                        isDragging = false;
-                        el.classList.remove('dragging');
-                    }
-                });
+                        <!-- Nome do Processo e Resultado Esperado -->
+                        <div class="lg:col-span-8 space-y-4">
+                            <div>
+                                <label class="block text-[10px] font-mono uppercase tracking-wider text-crimson-500 font-bold mb-1">Nome do Processo / Produto</label>
+                                <input type="text" value="${page.title}" oninput="app.updatePageField('title', this.value)" class="w-full bg-carbon-950 border border-zinc-800 focus:border-crimson-600 rounded-lg px-3.5 py-2 text-base font-bold text-white focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold mb-1">Resultado / Entrega Final</label>
+                                <textarea rows="2" oninput="app.updatePageField('result', this.value)" placeholder="Descreva o resultado final deste processo..." class="w-full bg-carbon-950 border border-zinc-800 focus:border-crimson-600 rounded-lg px-3.5 py-2 text-xs text-zinc-200 focus:outline-none resize-none">${page.result}</textarea>
+                            </div>
+
+                            <!-- Indicadores Diretos -->
+                            <div class="grid grid-cols-3 gap-3 pt-1">
+                                <div class="bg-carbon-950 border border-zinc-800/80 px-3 py-2 rounded-lg">
+                                    <span class="text-[10px] text-zinc-500 block uppercase">Células</span>
+                                    <span class="font-mono font-bold text-sm text-white">${page.cells.length} postos</span>
+                                </div>
+                                <div class="bg-carbon-950 border border-zinc-800/80 px-3 py-2 rounded-lg">
+                                    <span class="text-[10px] text-zinc-500 block uppercase">Tempo Padrão Total</span>
+                                    <span class="font-mono font-bold text-sm text-crimson-500">${totalCycle.toFixed(1)} s</span>
+                                </div>
+                                <div class="bg-carbon-950 border border-zinc-800/80 px-3 py-2 rounded-lg">
+                                    <span class="text-[10px] text-zinc-500 block uppercase">Componentes BOM</span>
+                                    <span class="font-mono font-bold text-sm text-white">${totalItems} SKUs</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- FLUXO SEQUENCIAL DE CÉLULAS -->
+                    <section class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xs font-mono uppercase tracking-wider font-bold text-zinc-400 flex items-center gap-2">
+                                <i class="fa-solid fa-diagram-project text-crimson-500"></i> Fluxo de Produção
+                            </h2>
+                            <div class="flex gap-2">
+                                <button onclick="app.addCell('Subconjunto')" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                                    + Subconjunto
+                                </button>
+                                <button onclick="app.addCell('Montagem')" class="bg-crimson-600 hover:bg-crimson-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                                    + Célula de Montagem
+                                </button>
+                                <button onclick="app.addCell('Inspeção')" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                                    + Inspeção / Teste
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cards das Células em Fluxo -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                            ${page.cells.map((cell, idx) => {
+                                const st = this.calcStandardTime(cell).toFixed(1);
+                                return `
+                                    <div class="bg-carbon-900 border border-zinc-800 hover:border-crimson-600/60 rounded-xl p-4 flex flex-col justify-between transition relative group">
+                                        <div class="absolute top-0 left-0 w-1 h-full bg-crimson-600 rounded-l-xl"></div>
+                                        
+                                        <div>
+                                            <div class="flex justify-between items-start gap-2 mb-2">
+                                                <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-zinc-800 text-crimson-400 font-bold">
+                                                    #${idx + 1} • ${cell.type}
+                                                </span>
+                                                <span class="font-mono text-xs font-bold text-white bg-carbon-950 px-2 py-0.5 rounded border border-zinc-800">
+                                                    ${st} s
+                                                </span>
+                                            </div>
+                                            <h3 class="font-bold text-sm text-white mb-3">${cell.name}</h3>
+                                            
+                                            <div class="space-y-1.5 text-xs text-zinc-400 bg-carbon-950 p-3 rounded-lg border border-zinc-800/80 mb-3">
+                                                <div class="flex justify-between">
+                                                    <span class="text-zinc-500">Operador:</span>
+                                                    <span class="text-zinc-200 font-medium">${cell.operator}</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-zinc-500">Kanban:</span>
+                                                    <span class="text-zinc-200 font-medium">${cell.kanban}</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-zinc-500">Input:</span>
+                                                    <span class="text-zinc-200 font-medium truncate max-w-[160px]">${cell.input}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center justify-between pt-2 border-t border-zinc-800/80 text-[11px] text-zinc-500">
+                                            <div class="flex gap-3">
+                                                <span><i class="fa-solid fa-list-ol text-crimson-500 mr-1"></i>${cell.steps.length} etapas</span>
+                                                <span><i class="fa-solid fa-box text-zinc-400 mr-1"></i>${cell.bom.length} pçs</span>
+                                                <span><i class="fa-solid fa-file-lines text-zinc-400 mr-1"></i>${cell.docs.length} RQs</span>
+                                            </div>
+                                            <button onclick="app.openDrawer(${cell.id})" class="bg-zinc-800 hover:bg-crimson-600 text-white px-3 py-1 rounded text-xs font-semibold transition">
+                                                Editar
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </section>
+                `;
             },
 
-            renderConnections() {
-                const svg = document.getElementById('connections-svg');
-                const defs = svg.querySelector('defs').outerHTML;
-                let pathsHtml = defs;
-
-                state.connections.forEach((conn, idx) => {
-                    const fromCell = state.cells.find(c => c.id === conn.from);
-                    const toCell = state.cells.find(c => c.id === conn.to);
-                    if (!fromCell || !toCell) return;
-
-                    // Pontos de saída (direita do bloco) e entrada (esquerda do bloco)
-                    const x1 = fromCell.x + 300;
-                    const y1 = fromCell.y + 85;
-                    const x2 = toCell.x;
-                    const y2 = toCell.y + 85;
-
-                    const dx = Math.abs(x2 - x1) * 0.5;
-                    const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
-
-                    pathsHtml += `
-                        <g class="pointer-events-auto cursor-pointer group" onclick="app.removeConnection(${idx})">
-                            <path d="${d}" stroke="transparent" stroke-width="14" fill="none" />
-                            <path d="${d}" stroke="#334155" stroke-width="3" fill="none" />
-                            <path d="${d}" stroke="#6366f1" stroke-width="2.5" fill="none" class="flow-line-animated" marker-end="url(#arrowhead)" />
-                        </g>
-                    `;
-                });
-
-                svg.innerHTML = pathsHtml;
+            // GERENCIAMENTO DE PÁGINAS
+            selectPage(id) {
+                state.activePageId = id;
+                this.closeDrawer();
+                this.saveStorage();
+                this.render();
             },
 
-            setupCanvasPanZoom() {
-                const viewport = document.getElementById('canvas-viewport');
-                const stage = document.getElementById('canvas-stage');
-                let isPanning = false;
-                let startX, startY;
-
-                viewport.addEventListener('mousedown', (e) => {
-                    if (e.target.closest('.node-card')) return;
-                    isPanning = true;
-                    startX = e.clientX - state.pan.x;
-                    startY = e.clientY - state.pan.y;
-                });
-
-                window.addEventListener('mousemove', (e) => {
-                    if (!isPanning) return;
-                    state.pan.x = e.clientX - startX;
-                    state.pan.y = e.clientY - startY;
-                    this.applyTransform();
-                });
-
-                window.addEventListener('mouseup', () => { isPanning = false; });
-
-                viewport.addEventListener('wheel', (e) => {
-                    e.preventDefault();
-                    const delta = e.deltaY < 0 ? 0.08 : -0.08;
-                    this.zoom(delta);
-                }, { passive: false });
+            createPage() {
+                const count = state.pages.length + 1;
+                const newPage = {
+                    id: Date.now(),
+                    title: `Processo 0${count} — Novo Produto`,
+                    photo: '',
+                    result: 'Produto montado, inspecionado e liberado conforme padrão de qualidade.',
+                    cells: []
+                };
+                state.pages.push(newPage);
+                state.activePageId = newPage.id;
+                this.saveStorage();
+                this.render();
             },
 
-            zoom(delta) {
-                state.scale = Math.min(1.6, Math.max(0.5, +(state.scale + delta).toFixed(2)));
-                document.getElementById('zoom-level').innerText = `${Math.round(state.scale * 100)}%`;
-                this.applyTransform();
+            deleteCurrentPage() {
+                if (state.pages.length <= 1) {
+                    alert('Você precisa manter pelo menos uma página ativa.');
+                    return;
+                }
+                if (confirm('Excluir esta página e todas as suas células?')) {
+                    state.pages = state.pages.filter(p => p.id !== state.activePageId);
+                    state.activePageId = state.pages[0].id;
+                    this.saveStorage();
+                    this.render();
+                }
             },
 
-            resetView() {
-                state.pan = { x: 0, y: 0 };
-                state.scale = 1;
-                document.getElementById('zoom-level').innerText = '100%';
-                this.applyTransform();
+            updatePageField(field, value) {
+                const page = this.getCurrentPage();
+                if (!page) return;
+                page[field] = value;
+                if (field === 'title') {
+                    document.getElementById('header-page-title').innerText = value;
+                    this.renderSidebar();
+                }
+                this.saveStorage();
             },
 
-            applyTransform() {
-                const stage = document.getElementById('canvas-stage');
-                stage.style.transform = `translate(${state.pan.x}px, ${state.pan.y}px) scale(${state.scale})`;
+            uploadPhoto(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.updatePageField('photo', e.target.result);
+                    this.renderWorkspace();
+                };
+                reader.readAsDataURL(file);
             },
 
-            addBlock(type) {
-                const style = BLOCK_STYLES[type] || BLOCK_STYLES.montagem;
-                const count = state.cells.length + 1;
-                const lastCell = state.cells[state.cells.length - 1];
+            resetAll() {
+                if (confirm('Restaurar dados padrão de fábrica?')) {
+                    localStorage.removeItem('auttec_v2_data');
+                    location.reload();
+                }
+            },
 
+            // GERENCIAMENTO DE CÉLULAS
+            addCell(type) {
+                const page = this.getCurrentPage();
+                const idx = page.cells.length + 1;
                 const newCell = {
                     id: Date.now(),
-                    x: lastCell ? lastCell.x + 360 : 100,
-                    y: lastCell ? lastCell.y : 140,
                     type,
-                    name: `Célula 0${count} — ${style.label}`,
-                    operator: '1x Operador Padrão',
-                    input: 'Componente da etapa anterior',
-                    kanban: 'Lote Padrão: 10 un.',
+                    name: `0${idx}. ${type} Padrão`,
+                    operator: 'Operador I',
+                    input: 'Material da etapa anterior',
+                    kanban: 'Lote 10 un.',
                     cycleObs: 30.0,
                     rating: 100,
                     allowance: 10,
-                    setup: 10,
-                    steps: ['Posicionar peça no gabarito.', 'Executar operação padrão conforme IT.'],
-                    bom: [{ code: `SKU-00${count}`, desc: 'Componente Padrão', qty: 1, unit: 'un' }],
+                    steps: ['Posicionar componente no dispositivo.', 'Executar montagem conforme padrão.'],
+                    bom: [{ code: `SKU-00${idx}`, desc: 'Componente Padrão', qty: 1, unit: 'un' }],
                     tools: ['Ferramenta Padrão'],
-                    docs: [`RQ-00${count} (Registro Qualidade)`]
+                    docs: [`RQ-0${idx}`]
                 };
-
-                state.cells.push(newCell);
-                if (lastCell) {
-                    state.connections.push({ from: lastCell.id, to: newCell.id });
-                }
+                page.cells.push(newCell);
+                this.saveStorage();
                 this.render();
                 this.openDrawer(newCell.id);
             },
 
-            startConnect(fromId) {
-                state.connectingFrom = fromId;
-                document.getElementById('connect-banner').classList.remove('hidden');
-            },
-
-            completeConnect(toId) {
-                const exists = state.connections.some(c => c.from === state.connectingFrom && c.to === toId);
-                if (!exists) {
-                    state.connections.push({ from: state.connectingFrom, to: toId });
-                }
-                this.cancelConnect();
-                this.renderConnections();
-            },
-
-            cancelConnect() {
-                state.connectingFrom = null;
-                document.getElementById('connect-banner').classList.add('hidden');
-            },
-
-            removeConnection(idx) {
-                if (confirm('Remover esta conexão de fluxo?')) {
-                    state.connections.splice(idx, 1);
-                    this.renderConnections();
-                }
-            },
-
-            autoAlign() {
-                state.cells.forEach((cell, idx) => {
-                    cell.x = 70 + idx * 360;
-                    cell.y = idx % 2 === 0 ? 120 : 240;
-                });
-                this.resetView();
-                this.render();
-            },
-
-            updateKPIs() {
-                document.getElementById('kpi-cells').innerText = state.cells.length;
-                const totalTime = state.cells.reduce((acc, c) => acc + this.calcStandardTime(c), 0);
-                const totalBom = state.cells.reduce((acc, c) => acc + c.bom.length, 0);
-                document.getElementById('kpi-time').innerText = `${totalTime.toFixed(1)} s`;
-                document.getElementById('kpi-bom').innerText = totalBom;
-            },
-
-            // DRAWER DE EDIÇÃO TÉCNICA
-            openDrawer(id) {
-                state.activeCellId = id;
-                state.activeTab = 'geral';
-                const cell = state.cells.find(c => c.id === id);
+            openDrawer(cellId) {
+                activeCellId = cellId;
+                activeTab = 'geral';
+                const page = this.getCurrentPage();
+                const cell = page.cells.find(c => c.id === cellId);
                 if (!cell) return;
 
-                const style = BLOCK_STYLES[cell.type] || BLOCK_STYLES.montagem;
-                document.getElementById('drawer-title').innerText = cell.name;
-                document.getElementById('drawer-subtitle').innerText = `Bloco: ${style.label}`;
-                document.getElementById('drawer-icon').innerHTML = `<i class="fa-solid ${style.icon}"></i>`;
-
+                document.getElementById('drawer-cell-name').innerText = cell.name;
                 this.setTab('geral');
-                document.getElementById('editor-drawer').classList.remove('translate-x-full');
-                this.renderNodes();
+                document.getElementById('cell-drawer').classList.remove('translate-x-full');
             },
 
             closeDrawer() {
-                state.activeCellId = null;
-                document.getElementById('editor-drawer').classList.add('translate-x-full');
-                this.renderNodes();
+                activeCellId = null;
+                document.getElementById('cell-drawer').classList.add('translate-x-full');
             },
 
             setTab(tab) {
-                state.activeTab = tab;
+                activeTab = tab;
                 ['geral', 'etapas', 'bom', 'docs'].forEach(t => {
-                    const el = document.getElementById(`tab-${t}`);
-                    el.className = t === tab
-                        ? 'flex-1 py-2.5 border-b-2 border-indigo-500 text-indigo-400 font-semibold'
-                        : 'flex-1 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200';
+                    const btn = document.getElementById(`tab-${t}`);
+                    btn.className = t === tab
+                        ? 'flex-1 py-2.5 border-b-2 border-crimson-600 text-white'
+                        : 'flex-1 py-2.5 border-b-2 border-transparent text-zinc-500 hover:text-zinc-300';
                 });
-                this.renderDrawerBody();
+                this.renderDrawerContent();
             },
 
-            renderDrawerBody() {
-                const cell = state.cells.find(c => c.id === state.activeCellId);
+            renderDrawerContent() {
+                const page = this.getCurrentPage();
+                const cell = page.cells.find(c => c.id === activeCellId);
                 if (!cell) return;
-                const body = document.getElementById('drawer-body');
+                const box = document.getElementById('drawer-content');
 
-                if (state.activeTab === 'geral') {
+                if (activeTab === 'geral') {
                     const st = this.calcStandardTime(cell).toFixed(2);
-                    body.innerHTML = `
+                    box.innerHTML = `
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-[11px] font-semibold uppercase text-slate-400 mb-1">Nome da Célula / Processo</label>
-                                <input type="text" id="inp-name" value="${cell.name}" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
+                                <label class="block text-[11px] font-bold uppercase text-zinc-400 mb-1">Nome da Célula</label>
+                                <input type="text" id="inp-name" value="${cell.name}" class="w-full bg-carbon-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:border-crimson-600 focus:outline-none">
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-[11px] font-semibold uppercase text-slate-400 mb-1">Operador</label>
-                                    <input type="text" id="inp-operator" value="${cell.operator}" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
+                                    <label class="block text-[11px] font-bold uppercase text-zinc-400 mb-1">Operador</label>
+                                    <input type="text" id="inp-operator" value="${cell.operator}" class="w-full bg-carbon-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:border-crimson-600 focus:outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] font-semibold uppercase text-slate-400 mb-1">Kanban / Lote Padrão</label>
-                                    <input type="text" id="inp-kanban" value="${cell.kanban}" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
+                                    <label class="block text-[11px] font-bold uppercase text-zinc-400 mb-1">Kanban / Lote</label>
+                                    <input type="text" id="inp-kanban" value="${cell.kanban}" class="w-full bg-carbon-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:border-crimson-600 focus:outline-none">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[11px] font-semibold uppercase text-slate-400 mb-1">Input de Entrada</label>
-                                <input type="text" id="inp-input" value="${cell.input}" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
+                                <label class="block text-[11px] font-bold uppercase text-zinc-400 mb-1">Input (Entrada)</label>
+                                <input type="text" id="inp-input" value="${cell.input}" class="w-full bg-carbon-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:border-crimson-600 focus:outline-none">
                             </div>
 
-                            <div class="pt-3 border-t border-slate-800">
-                                <h4 class="text-xs font-bold text-white mb-3 flex items-center gap-2">
-                                    <i class="fa-solid fa-stopwatch text-emerald-400"></i> Cronoanálise da Célula
-                                </h4>
-                                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
-                                    <div class="grid grid-cols-2 gap-3">
+                            <div class="pt-3 border-t border-zinc-800">
+                                <div class="text-xs font-bold text-white mb-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-stopwatch text-crimson-500"></i> Cronoanálise
+                                </div>
+                                <div class="bg-carbon-950 p-3.5 rounded-lg border border-zinc-800 space-y-3">
+                                    <div class="grid grid-cols-3 gap-2">
                                         <div>
-                                            <label class="block text-[10px] text-slate-400 mb-1">Tempo Observado (s)</label>
-                                            <input type="number" step="0.1" id="inp-cycle" value="${cell.cycleObs}" oninput="app.previewCrono()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+                                            <label class="block text-[10px] text-zinc-400 mb-1">Ciclo Obs (s)</label>
+                                            <input type="number" step="0.1" id="inp-cycle" value="${cell.cycleObs}" oninput="app.previewCrono()" class="w-full bg-carbon-900 border border-zinc-800 rounded px-2 py-1.5 text-xs text-white font-mono">
                                         </div>
                                         <div>
-                                            <label class="block text-[10px] text-slate-400 mb-1">Ritmo Operador (%)</label>
-                                            <input type="number" id="inp-rating" value="${cell.rating}" oninput="app.previewCrono()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+                                            <label class="block text-[10px] text-zinc-400 mb-1">Ritmo (%)</label>
+                                            <input type="number" id="inp-rating" value="${cell.rating}" oninput="app.previewCrono()" class="w-full bg-carbon-900 border border-zinc-800 rounded px-2 py-1.5 text-xs text-white font-mono">
                                         </div>
                                         <div>
-                                            <label class="block text-[10px] text-slate-400 mb-1">Fadiga / Tolerância (%)</label>
-                                            <input type="number" id="inp-allowance" value="${cell.allowance}" oninput="app.previewCrono()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
-                                        </div>
-                                        <div>
-                                            <label class="block text-[10px] text-slate-400 mb-1">Tempo Setup (min)</label>
-                                            <input type="number" step="0.5" id="inp-setup" value="${cell.setup}" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+                                            <label class="block text-[10px] text-zinc-400 mb-1">Fadiga (%)</label>
+                                            <input type="number" id="inp-allowance" value="${cell.allowance}" oninput="app.previewCrono()" class="w-full bg-carbon-900 border border-zinc-800 rounded px-2 py-1.5 text-xs text-white font-mono">
                                         </div>
                                     </div>
-                                    <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 flex justify-between items-center">
-                                        <span class="text-xs text-emerald-300">Tempo Médio Padrão:</span>
-                                        <span id="crono-result" class="font-mono font-bold text-emerald-400 text-sm">${st} s</span>
+                                    <div class="bg-crimson-600/10 border border-crimson-600/30 rounded p-2.5 flex justify-between items-center">
+                                        <span class="text-xs text-zinc-300">Tempo Médio Padrão:</span>
+                                        <span id="crono-preview" class="font-mono font-bold text-crimson-500 text-sm">${st} s</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     `;
-                } else if (state.activeTab === 'etapas') {
-                    body.innerHTML = `
+                } else if (activeTab === 'etapas') {
+                    box.innerHTML = `
                         <div class="space-y-3">
                             <div class="flex justify-between items-center">
-                                <span class="text-xs font-bold text-white">Sequência de Montagem</span>
-                                <button onclick="app.addStep()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-[11px] font-semibold">+ Nova Etapa</button>
+                                <span class="text-xs font-bold text-white">Etapas de Montagem</span>
+                                <button onclick="app.addStep()" class="bg-crimson-600 text-white px-2.5 py-1 rounded text-xs font-bold">+ Etapa</button>
                             </div>
                             ${cell.steps.map((s, i) => `
-                                <div class="flex gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-                                    <span class="w-6 h-6 rounded-lg bg-slate-900 text-indigo-400 font-mono text-xs flex items-center justify-center shrink-0">${i + 1}</span>
-                                    <textarea oninput="app.editStep(${i}, this.value)" rows="2" class="flex-1 bg-transparent text-xs text-slate-200 focus:outline-none resize-none">${s}</textarea>
-                                    <button onclick="app.delStep(${i})" class="text-slate-600 hover:text-rose-400 px-1"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                <div class="flex gap-2 bg-carbon-950 p-2.5 rounded-lg border border-zinc-800">
+                                    <span class="text-xs font-mono font-bold text-crimson-500 pt-1">${i + 1}.</span>
+                                    <textarea oninput="app.editStep(${i}, this.value)" rows="2" class="flex-1 bg-transparent text-xs text-white focus:outline-none resize-none">${s}</textarea>
+                                    <button onclick="app.delStep(${i})" class="text-zinc-600 hover:text-crimson-500"><i class="fa-solid fa-trash-can text-xs"></i></button>
                                 </div>
                             `).join('')}
                         </div>
                     `;
-                } else if (state.activeTab === 'bom') {
-                    body.innerHTML = `
+                } else if (activeTab === 'bom') {
+                    box.innerHTML = `
                         <div class="space-y-3">
                             <div class="flex justify-between items-center">
                                 <span class="text-xs font-bold text-white">Peças & Códigos (BOM)</span>
-                                <button onclick="app.addBom()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-[11px] font-semibold">+ Adicionar Peça</button>
+                                <button onclick="app.addBom()" class="bg-crimson-600 text-white px-2.5 py-1 rounded text-xs font-bold">+ Peça</button>
                             </div>
                             ${cell.bom.map((b, i) => `
-                                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
-                                    <div class="flex justify-between gap-2">
-                                        <input type="text" value="${b.code}" oninput="app.editBom(${i}, 'code', this.value)" placeholder="Código" class="bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs font-mono text-indigo-400 w-32">
-                                        <input type="number" step="any" value="${b.qty}" oninput="app.editBom(${i}, 'qty', this.value)" class="bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-white w-16 text-center">
-                                        <input type="text" value="${b.unit}" oninput="app.editBom(${i}, 'unit', this.value)" class="bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-slate-300 w-14 text-center">
-                                        <button onclick="app.delBom(${i})" class="text-slate-600 hover:text-rose-400 px-1"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                <div class="bg-carbon-950 p-2.5 rounded-lg border border-zinc-800 space-y-2">
+                                    <div class="flex gap-2">
+                                        <input type="text" value="${b.code}" oninput="app.editBom(${i}, 'code', this.value)" placeholder="Código" class="bg-carbon-900 border border-zinc-800 rounded px-2 py-1 text-xs font-mono text-crimson-400 w-28">
+                                        <input type="number" step="any" value="${b.qty}" oninput="app.editBom(${i}, 'qty', this.value)" class="bg-carbon-900 border border-zinc-800 rounded px-2 py-1 text-xs text-white w-16 text-center">
+                                        <input type="text" value="${b.unit}" oninput="app.editBom(${i}, 'unit', this.value)" class="bg-carbon-900 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-400 w-12 text-center">
+                                        <button onclick="app.delBom(${i})" class="text-zinc-600 hover:text-crimson-500 ml-auto"><i class="fa-solid fa-trash-can text-xs"></i></button>
                                     </div>
-                                    <input type="text" value="${b.desc}" oninput="app.editBom(${i}, 'desc', this.value)" placeholder="Descrição da peça" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white">
+                                    <input type="text" value="${b.desc}" oninput="app.editBom(${i}, 'desc', this.value)" placeholder="Descrição da peça" class="w-full bg-carbon-900 border border-zinc-800 rounded px-2 py-1 text-xs text-white">
                                 </div>
                             `).join('')}
                         </div>
                     `;
-                } else if (state.activeTab === 'docs') {
-                    body.innerHTML = `
-                        <div class="space-y-5">
+                } else if (activeTab === 'docs') {
+                    box.innerHTML = `
+                        <div class="space-y-4">
                             <div>
                                 <div class="flex justify-between items-center mb-2">
-                                    <span class="text-xs font-bold text-white">Ferramentas & Dispositivos</span>
-                                    <button onclick="app.addTool()" class="text-xs text-indigo-400 hover:underline">+ Adicionar</button>
+                                    <span class="text-xs font-bold text-white">Ferramentas</span>
+                                    <button onclick="app.addTool()" class="text-xs text-crimson-500 font-bold">+ Adicionar</button>
                                 </div>
-                                <div class="space-y-2">
+                                <div class="space-y-1.5">
                                     ${cell.tools.map((t, i) => `
-                                        <div class="flex items-center gap-2 bg-slate-950 px-3 py-2 rounded-xl border border-slate-800">
-                                            <i class="fa-solid fa-wrench text-amber-400 text-xs"></i>
+                                        <div class="flex items-center gap-2 bg-carbon-950 px-3 py-2 rounded-lg border border-zinc-800">
                                             <input type="text" value="${t}" oninput="app.editTool(${i}, this.value)" class="flex-1 bg-transparent text-xs text-white focus:outline-none">
-                                            <button onclick="app.delTool(${i})" class="text-slate-600 hover:text-rose-400"><i class="fa-solid fa-xmark text-xs"></i></button>
+                                            <button onclick="app.delTool(${i})" class="text-zinc-600 hover:text-crimson-500"><i class="fa-solid fa-xmark text-xs"></i></button>
                                         </div>
                                     `).join('')}
                                 </div>
                             </div>
-                            <div class="pt-3 border-t border-slate-800">
+                            <div class="pt-3 border-t border-zinc-800">
                                 <div class="flex justify-between items-center mb-2">
-                                    <span class="text-xs font-bold text-white">Documentos & RQs Obrigatórios</span>
-                                    <button onclick="app.addDoc()" class="text-xs text-indigo-400 hover:underline">+ Adicionar</button>
+                                    <span class="text-xs font-bold text-white">Documentos & RQs</span>
+                                    <button onclick="app.addDoc()" class="text-xs text-crimson-500 font-bold">+ Adicionar</button>
                                 </div>
-                                <div class="space-y-2">
+                                <div class="space-y-1.5">
                                     ${cell.docs.map((d, i) => `
-                                        <div class="flex items-center gap-2 bg-slate-950 px-3 py-2 rounded-xl border border-slate-800">
-                                            <i class="fa-solid fa-file-lines text-emerald-400 text-xs"></i>
+                                        <div class="flex items-center gap-2 bg-carbon-950 px-3 py-2 rounded-lg border border-zinc-800">
                                             <input type="text" value="${d}" oninput="app.editDoc(${i}, this.value)" class="flex-1 bg-transparent text-xs text-white focus:outline-none">
-                                            <button onclick="app.delDoc(${i})" class="text-slate-600 hover:text-rose-400"><i class="fa-solid fa-xmark text-xs"></i></button>
+                                            <button onclick="app.delDoc(${i})" class="text-zinc-600 hover:text-crimson-500"><i class="fa-solid fa-xmark text-xs"></i></button>
                                         </div>
                                     `).join('')}
                                 </div>
@@ -842,15 +675,15 @@
                 const c = parseFloat(document.getElementById('inp-cycle').value) || 0;
                 const r = parseFloat(document.getElementById('inp-rating').value) || 100;
                 const a = parseFloat(document.getElementById('inp-allowance').value) || 0;
-                const res = c * (r / 100) * (1 + a / 100);
-                document.getElementById('crono-result').innerText = `${res.toFixed(2)} s`;
+                document.getElementById('crono-preview').innerText = `${(c * (r / 100) * (1 + a / 100)).toFixed(2)} s`;
             },
 
             saveDrawer() {
-                const cell = state.cells.find(c => c.id === state.activeCellId);
+                const page = this.getCurrentPage();
+                const cell = page.cells.find(c => c.id === activeCellId);
                 if (!cell) return;
 
-                if (state.activeTab === 'geral') {
+                if (activeTab === 'geral') {
                     cell.name = document.getElementById('inp-name').value.trim() || cell.name;
                     cell.operator = document.getElementById('inp-operator').value;
                     cell.kanban = document.getElementById('inp-kanban').value;
@@ -858,134 +691,122 @@
                     cell.cycleObs = parseFloat(document.getElementById('inp-cycle').value) || 0;
                     cell.rating = parseFloat(document.getElementById('inp-rating').value) || 100;
                     cell.allowance = parseFloat(document.getElementById('inp-allowance').value) || 0;
-                    cell.setup = parseFloat(document.getElementById('inp-setup').value) || 0;
                 }
+                this.saveStorage();
                 this.closeDrawer();
                 this.render();
             },
 
             deleteActiveCell() {
-                if (!state.activeCellId) return;
-                if (confirm('Excluir esta célula do fluxo?')) {
-                    state.cells = state.cells.filter(c => c.id !== state.activeCellId);
-                    state.connections = state.connections.filter(cn => cn.from !== state.activeCellId && cn.to !== state.activeCellId);
+                if (!activeCellId) return;
+                if (confirm('Excluir esta célula?')) {
+                    const page = this.getCurrentPage();
+                    page.cells = page.cells.filter(c => c.id !== activeCellId);
+                    this.saveStorage();
                     this.closeDrawer();
                     this.render();
                 }
             },
 
-            // Manipuladores de Arrays internos
-            addStep() { const c = state.cells.find(x => x.id === state.activeCellId); c.steps.push('Nova etapa...'); this.renderDrawerBody(); },
-            editStep(i, v) { state.cells.find(x => x.id === state.activeCellId).steps[i] = v; },
-            delStep(i) { const c = state.cells.find(x => x.id === state.activeCellId); c.steps.splice(i, 1); this.renderDrawerBody(); },
+            // Helpers de listas internas
+            getCell() { return this.getCurrentPage().cells.find(c => c.id === activeCellId); },
+            addStep() { this.getCell().steps.push('Nova etapa...'); this.renderDrawerContent(); },
+            editStep(i, v) { this.getCell().steps[i] = v; this.saveStorage(); },
+            delStep(i) { this.getCell().steps.splice(i, 1); this.renderDrawerContent(); },
 
-            addBom() { const c = state.cells.find(x => x.id === state.activeCellId); c.bom.push({ code: 'COD-00', desc: 'Nova Peça', qty: 1, unit: 'un' }); this.renderDrawerBody(); },
-            editBom(i, f, v) { state.cells.find(x => x.id === state.activeCellId).bom[i][f] = v; },
-            delBom(i) { const c = state.cells.find(x => x.id === state.activeCellId); c.bom.splice(i, 1); this.renderDrawerBody(); },
+            addBom() { this.getCell().bom.push({ code: 'COD-00', desc: 'Nova Peça', qty: 1, unit: 'un' }); this.renderDrawerContent(); },
+            editBom(i, f, v) { this.getCell().bom[i][f] = v; this.saveStorage(); },
+            delBom(i) { this.getCell().bom.splice(i, 1); this.renderDrawerContent(); },
 
-            addTool() { const c = state.cells.find(x => x.id === state.activeCellId); c.tools.push('Nova Ferramenta'); this.renderDrawerBody(); },
-            editTool(i, v) { state.cells.find(x => x.id === state.activeCellId).tools[i] = v; },
-            delTool(i) { const c = state.cells.find(x => x.id === state.activeCellId); c.tools.splice(i, 1); this.renderDrawerBody(); },
+            addTool() { this.getCell().tools.push('Nova Ferramenta'); this.renderDrawerContent(); },
+            editTool(i, v) { this.getCell().tools[i] = v; this.saveStorage(); },
+            delTool(i) { this.getCell().tools.splice(i, 1); this.renderDrawerContent(); },
 
-            addDoc() { const c = state.cells.find(x => x.id === state.activeCellId); c.docs.push('Novo RQ / Documento'); this.renderDrawerBody(); },
-            editDoc(i, v) { state.cells.find(x => x.id === state.activeCellId).docs[i] = v; },
-            delDoc(i) { const c = state.cells.find(x => x.id === state.activeCellId); c.docs.splice(i, 1); this.renderDrawerBody(); },
+            addDoc() { this.getCell().docs.push('Novo RQ'); this.renderDrawerContent(); },
+            editDoc(i, v) { this.getCell().docs[i] = v; this.saveStorage(); },
+            delDoc(i) { this.getCell().docs.splice(i, 1); this.renderDrawerContent(); },
 
-            // GERADOR DE PDF (IT GERAL + BOM CONSOLIDADA)
-            generateITModal() {
-                const productName = document.getElementById('product-name').value || 'Produto Padrão';
-                const totalTime = state.cells.reduce((acc, c) => acc + this.calcStandardTime(c), 0);
+            // GERADOR DE PDF (IT GERAL & BOM)
+            openITModal() {
+                const page = this.getCurrentPage();
+                const totalCycle = page.cells.reduce((sum, c) => sum + this.calcStandardTime(c), 0);
 
-                // Consolidar BOM
-                const bomConsolidated = {};
-                state.cells.forEach(c => {
-                    c.bom.forEach(item => {
-                        const key = item.code.trim().toUpperCase();
-                        const q = parseFloat(item.qty) || 0;
-                        if (bomConsolidated[key]) {
-                            bomConsolidated[key].qty += q;
-                        } else {
-                            bomConsolidated[key] = { desc: item.desc, qty: q, unit: item.unit };
-                        }
+                const bomMap = {};
+                page.cells.forEach(c => {
+                    c.bom.forEach(b => {
+                        const k = b.code.trim().toUpperCase();
+                        const q = parseFloat(b.qty) || 0;
+                        if (bomMap[k]) bomMap[k].qty += q;
+                        else bomMap[k] = { desc: b.desc, qty: q, unit: b.unit };
                     });
                 });
 
-                const bomRows = Object.entries(bomConsolidated).map(([code, data]) => `
+                const bomRows = Object.entries(bomMap).map(([code, item]) => `
                     <tr>
-                        <td class="border border-slate-300 px-3 py-1.5 font-mono font-bold text-slate-900">${code}</td>
-                        <td class="border border-slate-300 px-3 py-1.5">${data.desc}</td>
-                        <td class="border border-slate-300 px-3 py-1.5 text-right font-semibold">${data.qty} ${data.unit}</td>
+                        <td class="border border-zinc-300 px-3 py-1.5 font-mono font-bold">${code}</td>
+                        <td class="border border-zinc-300 px-3 py-1.5">${item.desc}</td>
+                        <td class="border border-zinc-300 px-3 py-1.5 text-right font-bold">${item.qty} ${item.unit}</td>
                     </tr>
                 `).join('');
 
-                const cellsBlocks = state.cells.map((cell, idx) => {
-                    const st = this.calcStandardTime(cell).toFixed(2);
-                    const style = BLOCK_STYLES[cell.type] || BLOCK_STYLES.montagem;
-                    return `
-                        <div class="border border-slate-300 rounded-lg p-4 mb-4 break-inside-avoid">
-                            <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
-                                <div>
-                                    <span class="text-[10px] font-bold uppercase text-indigo-700">Posto #${idx + 1} • ${style.label}</span>
-                                    <h4 class="font-bold text-sm text-slate-900">${cell.name}</h4>
-                                </div>
-                                <div class="text-right text-xs">
-                                    <span class="text-slate-500">Tempo Padrão:</span>
-                                    <strong class="font-mono text-emerald-700 text-sm">${st} s</strong>
-                                </div>
+                const cellsHtml = page.cells.map((c, idx) => `
+                    <div class="border border-zinc-300 rounded p-4 mb-4 break-inside-avoid">
+                        <div class="flex justify-between items-center border-b border-zinc-200 pb-2 mb-2">
+                            <div>
+                                <span class="text-[10px] font-bold uppercase text-red-600">Célula #${idx + 1} • ${c.type}</span>
+                                <h4 class="font-bold text-sm text-zinc-900">${c.name}</h4>
                             </div>
-                            <div class="grid grid-cols-3 gap-2 text-xs bg-slate-50 p-2.5 rounded mb-3">
-                                <div><strong>Operador:</strong> ${cell.operator}</div>
-                                <div><strong>Input:</strong> ${cell.input}</div>
-                                <div><strong>Kanban:</strong> ${cell.kanban}</div>
-                            </div>
-                            <div class="mb-3 text-xs">
-                                <strong class="block mb-1 text-slate-800">Etapas de Execução:</strong>
-                                <ol class="list-decimal pl-5 space-y-1 text-slate-700">
-                                    ${cell.steps.map(s => `<li>${s}</li>`).join('')}
-                                </ol>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4 text-xs pt-2 border-t border-slate-200">
-                                <div>
-                                    <strong class="block mb-1 text-slate-800">Peças Utilizadas:</strong>
-                                    <ul class="space-y-0.5 text-slate-700 font-mono text-[11px]">
-                                        ${cell.bom.map(b => `<li>• ${b.code} — ${b.desc} (${b.qty} ${b.unit})</li>`).join('')}
-                                    </ul>
-                                </div>
-                                <div>
-                                    <strong class="block mb-1 text-slate-800">Ferramentas & Documentos (RQs):</strong>
-                                    <ul class="space-y-0.5 text-slate-700 text-[11px]">
-                                        ${cell.tools.map(t => `<li>🔧 ${t}</li>`).join('')}
-                                        ${cell.docs.map(d => `<li>📄 ${d}</li>`).join('')}
-                                    </ul>
-                                </div>
+                            <div class="text-right text-xs">
+                                <span class="text-zinc-500">Tempo Padrão:</span>
+                                <strong class="font-mono text-sm">${this.calcStandardTime(c).toFixed(2)} s</strong>
                             </div>
                         </div>
-                    `;
-                }).join('');
+                        <div class="grid grid-cols-3 gap-2 text-xs bg-zinc-100 p-2 rounded mb-2">
+                            <div><strong>Operador:</strong> ${c.operator}</div>
+                            <div><strong>Input:</strong> ${c.input}</div>
+                            <div><strong>Kanban:</strong> ${c.kanban}</div>
+                        </div>
+                        <div class="text-xs mb-2">
+                            <strong>Etapas:</strong>
+                            <ol class="list-decimal pl-5 mt-1 space-y-0.5">${c.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-xs pt-2 border-t border-zinc-200">
+                            <div>
+                                <strong>Peças:</strong>
+                                <ul class="font-mono text-[11px] mt-0.5">${c.bom.map(b => `<li>• ${b.code} - ${b.desc} (${b.qty} ${b.unit})</li>`).join('')}</ul>
+                            </div>
+                            <div>
+                                <strong>Ferramentas & RQs:</strong>
+                                <ul class="text-[11px] mt-0.5">${c.tools.map(t => `<li>• ${t}</li>`).join('')}${c.docs.map(d => `<li>• ${d}</li>`).join('')}</ul>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
 
                 document.getElementById('print-section').innerHTML = `
                     <div class="space-y-6">
-                        <div class="flex justify-between items-end border-b-2 border-slate-900 pb-4">
+                        <div class="flex justify-between items-start border-b-2 border-zinc-900 pb-4">
                             <div>
-                                <div class="text-xs font-bold uppercase tracking-widest text-indigo-700">AUTTEC 2.0 • ENGENHARIA DE MANUFATURA</div>
-                                <h1 class="text-xl font-extrabold text-slate-900 mt-1">INSTRUÇÃO DE TRABALHO GERAL & BOM</h1>
-                                <p class="text-xs text-slate-600 mt-0.5">Produto: <strong>${productName}</strong></p>
+                                <div class="text-xs font-black uppercase tracking-widest text-red-600">AUTTEC 2.0 • ENGENHARIA INDUSTRIAL</div>
+                                <h1 class="text-xl font-extrabold text-zinc-950 mt-1">${page.title}</h1>
+                                <p class="text-xs text-zinc-700 mt-1"><strong>Resultado Esperado:</strong> ${page.result}</p>
                             </div>
-                            <div class="text-right text-xs text-slate-600 space-y-0.5">
-                                <div>Emissão: <strong>${new Date().toLocaleDateString('pt-BR')}</strong></div>
-                                <div>Tempo Total Padrão: <strong class="font-mono text-emerald-700">${totalTime.toFixed(1)} seg</strong></div>
-                                <div>Total de Células: <strong>${state.cells.length}</strong></div>
+                            <div class="text-right text-xs text-zinc-600 shrink-0 ml-4">
+                                <div>Data: <strong>${new Date().toLocaleDateString('pt-BR')}</strong></div>
+                                <div>Ciclo Total: <strong>${totalCycle.toFixed(1)} s</strong></div>
                             </div>
                         </div>
 
+                        ${page.photo ? `<div class="border border-zinc-300 rounded overflow-hidden max-h-56 flex justify-center bg-zinc-100"><img src="${page.photo}" class="object-contain max-h-56"></div>` : ''}
+
                         <div>
-                            <h2 class="text-xs font-bold uppercase tracking-wider bg-slate-900 text-white px-3 py-1.5 rounded mb-2">1. Lista Consolidada de Materiais (BOM)</h2>
+                            <h2 class="text-xs font-bold uppercase bg-zinc-900 text-white px-3 py-1.5 mb-2">1. Lista Consolidada de Materiais (BOM)</h2>
                             <table class="w-full text-xs border-collapse">
                                 <thead>
-                                    <tr class="bg-slate-100">
-                                        <th class="border border-slate-300 px-3 py-1.5 text-left">Código</th>
-                                        <th class="border border-slate-300 px-3 py-1.5 text-left">Descrição do Item</th>
-                                        <th class="border border-slate-300 px-3 py-1.5 text-right">Qtd. Total</th>
+                                    <tr class="bg-zinc-100">
+                                        <th class="border border-zinc-300 px-3 py-1.5 text-left">Código</th>
+                                        <th class="border border-zinc-300 px-3 py-1.5 text-left">Descrição</th>
+                                        <th class="border border-zinc-300 px-3 py-1.5 text-right">Qtd Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>${bomRows}</tbody>
@@ -993,8 +814,8 @@
                         </div>
 
                         <div>
-                            <h2 class="text-xs font-bold uppercase tracking-wider bg-slate-900 text-white px-3 py-1.5 rounded mb-3">2. Roteiro de Processo & Cronoanálise por Célula</h2>
-                            ${cellsBlocks}
+                            <h2 class="text-xs font-bold uppercase bg-zinc-900 text-white px-3 py-1.5 mb-3">2. Instrução de Trabalho por Célula</h2>
+                            ${cellsHtml}
                         </div>
                     </div>
                 `;
